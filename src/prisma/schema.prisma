@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String    @id @default(uuid())
+  email      String    @unique
+  hash       String    @map("password_hash")
+  first_name String?
+  last_name  String?
+  address    String?
+  phone      String?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  cart       Cart?
+  orders     Order[]
+  sessions   Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id          String   @id @default(uuid())
+  sid         String   @unique
+  data        String
+  expiresAt   DateTime
+  createad_at DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  active      Boolean? @default(true)
+  userAgent   String?
+  user_id     String?
+  user        User?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Cart {
+  id         String   @id @default(uuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  cart_items CartItem[]
+  user_id    String     @unique
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("carts")
+}
+
+model CartItem {
+  id          String   @id @default(uuid())
+  createad_at DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  product_id String
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  quantitiy  Int
+  cart_id    String
+  cart       Cart    @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+
+  @@map("cart_items")
+}
+
+model Order {
+  id         String   @id @default(uuid())
+  cretead_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  status      Status
+  total_price Int
+  oder_items  OrderItem[]
+
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("orders")
+}
+
+enum Status {
+  PENDING
+  CANCELED
+  COMPLETED
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  product_id String
+  product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  quantity   Int
+
+  order_id String
+  order    Order  @relation(fields: [order_id], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+model Product {
+  id          String      @id @default(uuid())
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+  order_items OrderItem[]
+  cart_items  CartItem[]
+  name        String
+  url         String
+  description String
+  price       Int
+
+  @@map("produtcs")
+}
