@@ -9,7 +9,8 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "build",
-    "types": ["jest", "reflect-metadata"]
+    // "types": ["jest", "reflect-metadata"]
+    "typeRoots": ["src/typings", "./node_modules/@types/"]
   },
   "exclude": ["node_modules/"],
   "include": ["src/**/*.ts", "test/**/*.ts"]

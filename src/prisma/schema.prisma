@@ -14,18 +14,19 @@ datasource db {
 }
 
 model User {
-  id         String    @id @default(uuid())
-  email      String    @unique
-  hash       String    @map("password_hash")
-  first_name String?
-  last_name  String?
-  address    String?
-  phone      String?
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  cart       Cart?
-  orders     Order[]
-  sessions   Session[]
+  id            String    @id @default(uuid())
+  email         String    @unique
+  hash          String    @map("password_hash")
+  first_name    String?
+  last_name     String?
+  address       String?
+  phone         String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  cart          Cart?
+  orders        Order[]
+  sessions      Session[]
+  refresh_token String?
 
   @@map("users")
 }
@@ -33,7 +34,7 @@ model User {
 model Session {
   id          String   @id @default(uuid())
   sid         String   @unique
-  data        String
+  data        String   @db.Text
   expiresAt   DateTime
   createad_at DateTime @default(now())
   updated_at  DateTime @updatedAt

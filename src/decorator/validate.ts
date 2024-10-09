@@ -17,6 +17,7 @@ export function Validate(schema: Joi.ObjectSchema) {
         await schema.validateAsync(req.body);
       } catch (error) {
         console.error(error);
+        res.status(422).json(error);
       }
       return originalMethod.call(this, req, res, next);
     };

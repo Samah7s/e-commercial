@@ -1,4 +1,10 @@
 # GET http://localhost:3000/ HTTP/1.1
 
 
-GET http://localhost:3000/healthcheck
+POST http://localhost:3000/user/register
+Content-Type: application/json
+
+{
+	"email": "mail4@mail.com",
+	"password": "ss9095504"
+}

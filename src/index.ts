@@ -5,12 +5,13 @@ import dotenv from "dotenv";
 dotenv.config();
 import config from "./config";
 import session from "express-session";
+import cookieParser from "cookie-parser";
 import { PrismaClient } from "@prisma/client";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import passport from "passport";
 import corsHandler from "./middlewares/corsHandler";
 import { defineRoutes } from "./modules/routes";
-import UserController from "./controllers/user";
+import authRouter from "./controllers/auth";
 import MainController from "./controllers/main";
 
 export const app = express();
@@ -20,7 +21,7 @@ export let httpServer: ReturnType<typeof http.createServer>;
 //MIDDLEWARES DEFINITON
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
+app.use(cookieParser());
 app.use(
   session({
     secret: config.session_secret as string,
@@ -44,7 +45,7 @@ app.use(passport.session());
 app.use(corsHandler);
 
 //ROUTE DEFINITIONS
-defineRoutes([UserController, MainController], app);
+defineRoutes([authRouter, MainController], app);
 
 httpServer = http.createServer(app);
 httpServer.listen(config.port, () => {
