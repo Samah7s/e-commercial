@@ -11,8 +11,9 @@ import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import passport from "passport";
 import corsHandler from "./middlewares/corsHandler";
 import { defineRoutes } from "./modules/routes";
-import authRouter from "./controllers/auth";
+import authController from "./controllers/auth";
 import MainController from "./controllers/main";
+import ProductController from "./controllers/products";
 
 export const app = express();
 
@@ -40,12 +41,12 @@ app.use(
     }),
   })
 );
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 app.use(corsHandler);
 
 //ROUTE DEFINITIONS
-defineRoutes([authRouter, MainController], app);
+defineRoutes([authController, MainController, ProductController], app);
 
 httpServer = http.createServer(app);
 httpServer.listen(config.port, () => {
