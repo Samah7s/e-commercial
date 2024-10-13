@@ -81,7 +81,6 @@ class ProductController {
           id,
         },
       });
-      console;
       if (!productData) {
         throw new Error("Bad credentials for product data");
       }
@@ -93,6 +92,25 @@ class ProductController {
       res.status(404).json({
         message: "Something gone wrong",
         error: error,
+      });
+    }
+  }
+
+  @Route("get", "/", auth)
+  async getAllProduct(req: Request, res: Response) {
+    try {
+      const requestedData = await prisma.product.findMany({});
+      if (!requestedData) {
+        throw new Error("Cannot get all product, please do something");
+      }
+      res.status(200).json({
+        message: "Products got successfully",
+        data: requestedData,
+      });
+    } catch (error) {
+      res.status(400).json({
+        message: "Something gone wrong",
+        error,
       });
     }
   }

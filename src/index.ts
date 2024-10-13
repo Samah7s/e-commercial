@@ -8,12 +8,13 @@ import session from "express-session";
 import cookieParser from "cookie-parser";
 import { PrismaClient } from "@prisma/client";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
-import passport from "passport";
 import corsHandler from "./middlewares/corsHandler";
 import { defineRoutes } from "./modules/routes";
 import authController from "./controllers/auth";
 import MainController from "./controllers/main";
 import ProductController from "./controllers/products";
+import CartController from "./controllers/cart";
+import OrderController from "./controllers/order";
 
 export const app = express();
 
@@ -41,17 +42,25 @@ app.use(
     }),
   })
 );
-// app.use(passport.initialize());
-// app.use(passport.session());
 app.use(corsHandler);
 
 //ROUTE DEFINITIONS
-defineRoutes([authController, MainController, ProductController], app);
+defineRoutes(
+  [
+    authController,
+    MainController,
+    ProductController,
+    CartController,
+    OrderController,
+  ],
+  app
+);
 
 httpServer = http.createServer(app);
 httpServer.listen(config.port, () => {
   console.log(`Server running at port ${config.port}`);
 });
 
+//testing purpose only
 export const Shutdown = (callback: any) =>
   httpServer && httpServer.close(callback);

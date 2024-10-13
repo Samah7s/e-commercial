@@ -5,7 +5,8 @@ import Joi from "joi";
 import bcrypt from "bcrypt";
 import prisma from "../lib/prismaClients";
 import { Validate } from "../decorator/validate";
-import testMiddleware from "../middlewares/testMiddleware";
+import jwt from "jsonwebtoken";
+import config from "../config";
 import { generateAccessToken, generateRefreshToken } from "../lib/tokens";
 
 const registerLoginValidation = Joi.object({
@@ -15,7 +16,7 @@ const registerLoginValidation = Joi.object({
 
 @Controller("/auth")
 class AuthController {
-  @Route("post", "/register", testMiddleware)
+  @Route("post", "/register")
   @Validate(registerLoginValidation)
   async register(req: Request, res: Response) {
     try {
@@ -27,13 +28,19 @@ class AuthController {
           email,
           hash,
           refresh_token,
+          cart: {
+            create: {},
+          },
         },
+
         select: {
           email: true,
           id: true,
+          cart: true,
         },
       });
       req.session.access_token = generateAccessToken(result.id, result.email);
+      req.session.cart_id = result.cart?.id;
       res
         .status(200)
         .cookie("refreshToken", refresh_token, {
@@ -105,9 +112,47 @@ class AuthController {
       });
     } catch (error) {}
   }
-	async token(req:Request, res: Response){
-
-	}
+  @Route("get", "/token")
+  async token(req: Request, res: Response) {
+    const currentRefreshToken =
+      req.cookies.refreshToken || req.body.refreshToken;
+    if (!currentRefreshToken) {
+      return res.status(401).json({
+        message: "Refresh token not found, pleas sign in",
+      });
+    }
+    try {
+      const decodedToken = <jwt.JwtPayload>(
+        jwt.verify(currentRefreshToken, config.refresh_secret)
+      );
+      const foudUser = await prisma.user.findUnique({
+        where: {
+          email: decodedToken.email,
+        },
+      });
+      if (!foudUser) {
+        return res.status(404).json({
+          message: "Bad credentials",
+        });
+      }
+      console.log(foudUser);
+      console.log(currentRefreshToken);
+      if (foudUser.refresh_token != currentRefreshToken) {
+        return res.status(401).json({
+          message: "Wrong token, please sign in again",
+        });
+      }
+      const access_token = generateAccessToken(foudUser.id, foudUser.email);
+      req.session.access_token = access_token;
+      return res.status(200).json({
+        message: "Access token refreshed",
+      });
+    } catch (error) {
+      res.status(498).json({
+        message: "Something gone wrong while updating token",
+      });
+    }
+  }
 }
 
 export default AuthController;
