@@ -80,6 +80,8 @@ class AuthController {
         foundUser.id,
         foundUser.email
       );
+      req.session.user_id = foundUser.id;
+      req.session.isAuthenticated = true;
       res
         .status(200)
         .cookie("refreshToken", generateRefreshToken(foundUser.email), {
@@ -135,9 +137,7 @@ class AuthController {
           message: "Bad credentials",
         });
       }
-      console.log(foudUser);
-      console.log(currentRefreshToken);
-      if (foudUser.refresh_token != currentRefreshToken) {
+      if (foudUser.refresh_token !== currentRefreshToken) {
         return res.status(401).json({
           message: "Wrong token, please sign in again",
         });

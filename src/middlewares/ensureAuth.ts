@@ -10,7 +10,6 @@ export async function auth(req: Request, res: Response, next: NextFunction) {
       req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
       console.log("token not exist");
-      console.log(req.session);
       req.session.isAuthenticated = false;
       throw new Error("Invalid token");
     }

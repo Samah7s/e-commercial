@@ -33,7 +33,7 @@ app.use(
       secure: false,
       httpOnly: true,
       sameSite: false,
-      maxAge: 1000 * 60 * 2,
+      maxAge: 1000 * 60 * 60,
     },
     store: new PrismaSessionStore(new PrismaClient() as any, {
       checkPeriod: 2 * 60 * 1000,

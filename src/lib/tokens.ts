@@ -4,7 +4,9 @@ import prisma from "../lib/prismaClients";
 import config from "../config";
 
 export function generateAccessToken(id: string, email: string) {
-  return jwt.sign({ id, email }, config.access_secret, { expiresIn: "20m" });
+  return jwt.sign({ id, email }, config.access_secret, {
+    expiresIn: 1000 * 60 * 60,
+  });
 }
 
 export function generateRefreshToken(email: string) {

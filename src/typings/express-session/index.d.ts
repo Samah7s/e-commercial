@@ -6,6 +6,7 @@ declare module "express-session" {
     user_id?: string;
     access_token?: string;
     cart_id?: string;
+    order_id?: string | null;
     isAuthenticated?: boolean;
   }
 }
